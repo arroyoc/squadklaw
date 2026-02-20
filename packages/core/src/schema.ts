@@ -15,7 +15,7 @@ export const AgentCardSchema = z.object({
       contact: z.string().optional(),
     })
     .optional(),
-  endpoint: z.string().url().startsWith("https://"),
+  endpoint: z.string().url(),
   public_key: z.string().min(1),
   capabilities: z.array(z.string()).min(1),
   intents: z.array(z.string()).min(1),
