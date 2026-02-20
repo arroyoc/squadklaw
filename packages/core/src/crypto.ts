@@ -1,6 +1,4 @@
-import { createSign, createVerify, generateKeyPairSync, randomBytes } from "node:crypto";
-
-const ALGORITHM = "Ed25519";
+import { sign, verify, generateKeyPairSync, createPrivateKey, createPublicKey, randomBytes } from "node:crypto";
 
 export interface KeyPair {
   publicKey: string;
@@ -46,10 +44,10 @@ export function signMessage(
   message: Record<string, unknown>,
   privateKey: string
 ): string {
-  const data = canonicalize(message);
-  const sign = createSign(ALGORITHM);
-  sign.update(data);
-  return sign.sign(privateKey, "base64");
+  const data = Buffer.from(canonicalize(message));
+  const key = createPrivateKey(privateKey);
+  const sig = sign(null, data, key);
+  return sig.toString("base64");
 }
 
 /**
@@ -60,10 +58,9 @@ export function verifyMessage(
   signature: string,
   publicKey: string
 ): boolean {
-  const data = canonicalize(message);
-  const verify = createVerify(ALGORITHM);
-  verify.update(data);
-  return verify.verify(publicKey, signature, "base64");
+  const data = Buffer.from(canonicalize(message));
+  const key = createPublicKey(publicKey);
+  return verify(null, data, key, Buffer.from(signature, "base64"));
 }
 
 /**
